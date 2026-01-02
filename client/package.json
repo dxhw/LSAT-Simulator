@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "description": "LSAT Simulator",
-  "homepage": "https://dxhw.github.io/lsat",
+  "homepage": "https://dxhw.github.io/LSAT-Simulator",
   "license": "UNLICENSED",
   "dependencies": {
     "react": "^18.3.1",
