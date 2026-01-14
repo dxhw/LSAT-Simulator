@@ -1,11 +1,13 @@
 /* =========================================
    1. GLOBAL RESET & LAYOUT
    ========================================= */
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   background-color: #121212; /* Fallback dark bg */
   color: #eee;
 }
@@ -43,11 +45,47 @@ html, body {
   font-weight: bolder;
 }
 
+.header-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding-right: 1rem;
+}
+
 .header-info {
   color: #ccc;
   font-family: monospace;
   font-size: 1.2rem;
   padding-right: 1.5rem;
+}
+
+.btn-stop {
+  background-color: rgb(221, 44, 44);
+}
+
+@media (max-width: 768px) {
+  .header {
+    font-size: calc(10px + 1vmin);
+    padding-left: 0rem;
+  }
+
+  .header-controls {
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+    gap: 0.3rem;
+  }
+}
+
+.timer-display {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .timer-display {
+    font-size: 0.8rem;
+  }
 }
 
 /* Header Light Mode Overrides */
@@ -56,8 +94,18 @@ html, body {
     background-color: #f0f0f0;
     border-bottom-color: #ccc;
   }
-  .header { color: #333; }
-  .header-info { color: #555; }
+  .header {
+    color: #333;
+  }
+  .header-info {
+    color: #555;
+  }
+  .btn-stop {
+    color: white;
+  }
+  .timer-display {
+    color: black;
+  }
 }
 
 /* =========================================
@@ -73,14 +121,16 @@ html, body {
   overflow-y: auto;
 }
 
-.timing-selector, .mode-buttons {
+.timing-selector,
+.mode-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
 }
 
-.mode-buttons button, .timing-selector button {
+.mode-buttons button,
+.timing-selector button {
   padding: 1rem 2rem;
   font-size: 1.1rem;
   font-weight: bold;
@@ -91,7 +141,8 @@ html, body {
   transition: background-color 0.2s;
 }
 
-.mode-buttons button:hover, .timing-selector button:hover {
+.mode-buttons button:hover,
+.timing-selector button:hover {
   background-color: #3a3a3a;
   border-color: #646cff;
 }
@@ -102,6 +153,14 @@ html, body {
   border-color: transparent !important;
 }
 
+/* Layout Light Mode Overrides */
+@media (prefers-color-scheme: light) {
+  .start-screen {
+    background-color: white;
+    color: black;
+  }
+}
+
 /* =========================================
    4. MAIN SPLIT LAYOUT (Context vs Question)
    ========================================= */
@@ -109,10 +168,15 @@ html, body {
   flex: 1;
   display: flex;
   flex-direction: row;
-  min-height: 0; 
+  min-height: 0;
   overflow: hidden;
 }
 
+@media (max-width: 768px) {
+  .App-body {
+    flex-direction: column;
+  }
+}
 .pane {
   min-width: 0;
   min-height: 0;
@@ -132,6 +196,19 @@ html, body {
   color: #ddd;
 }
 
+@media (max-width: 768px) {
+  .left {
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-height: 15rem;
+  }
+  .left.expanded {
+    max-height: none;
+  }
+}
+
 /* --- RIGHT PANE (Interface) --- */
 .right {
   flex: 1;
@@ -140,6 +217,15 @@ html, body {
   background-color: #242424;
   overflow: hidden;
   padding: 0;
+}
+
+@media (max-width: 768px) {
+  .right {
+    overflow: auto;
+    border-top-color: #ffffff;
+    border-top-width: 0.1rem;
+    border-top-style: solid;
+  }
 }
 
 /* Layout Light Mode Overrides */
@@ -151,6 +237,7 @@ html, body {
   }
   .right {
     background-color: #ffffff;
+    border-top-color: #000;
   }
 }
 
@@ -214,16 +301,7 @@ html, body {
   flex-shrink: 0;
 }
 
-.eliminate-btn {
-  padding: 0 1rem;
-  font-size: 1rem;
-  background-color: transparent;
-  color: #666;
-  border: 1px solid #444;
-  cursor: pointer;
-}
-
-.answer-btn {
+.answer-decoy-btn {
   flex: 1;
   text-align: left;
   padding: 1rem;
@@ -237,23 +315,45 @@ html, body {
   transition: background-color 0.1s;
 }
 
-.answer-btn:hover {
+.answer-decoy-btn:hover {
   background-color: #3a3a3a;
   border-color: #646cff;
 }
 
-.answer-btn.selected {
+.answer-decoy-btn.selected {
   background-color: #007bff;
   color: white;
   border-color: #0056b3;
 }
 
-.answer-btn.eliminated {
+.answer-decoy-btn.selected:hover {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
+}
+
+.answer-decoy-btn.eliminated {
   background-color: #1a1a1a;
   color: #555;
   text-decoration: line-through;
   opacity: 0.6;
   border-color: transparent;
+  cursor: not-allowed;
+}
+
+.answer-decoy-btn.eliminate {
+  padding: 0 1rem;
+  cursor: pointer;
+  flex: 0;
+}
+
+.answer-decoy-btn.eliminate.eliminated {
+  text-decoration: none;
+  color: #d6d6d6;
+}
+
+.answer-decoy-btn.disabled {
+  cursor: not-allowed;
 }
 
 .answer-letter {
@@ -264,17 +364,49 @@ html, body {
 
 /* Question Area Light Mode Overrides */
 @media (prefers-color-scheme: light) {
-  .question-toolbar { border-bottom-color: #e0e0e0; }
-  .question-label { color: #555; }
-  .question-text { color: #222; }
-  
-  .answer-btn {
+  .question-toolbar {
+    border-bottom-color: #e0e0e0;
+  }
+  .question-label {
+    color: #555;
+  }
+  .question-text {
+    color: #222;
+  }
+
+  .answer-decoy-btn {
     background-color: #f0f0f0;
     color: #333;
     border-color: #ccc;
   }
-  .answer-btn:hover { background-color: #e0e0e0; }
-  .eliminate-btn { border-color: #ccc; }
+  .answer-decoy-btn.eliminated {
+    background-color: #8a8a8a;
+    color: #000000;
+  }
+  .answer-decoy-btn.eliminate.eliminated {
+    color: black;
+  }
+  .answer-decoy-btn:hover {
+    background-color: #e0e0e0;
+  }
+}
+
+@media (max-width: 768px) {
+  .question-area {
+    padding: 0.2rem 1rem;
+  }
+  .question-label {
+    font-size: 0.8rem;
+  }
+  .question-text {
+    margin-bottom: 0.1rem;
+    margin-top: 0.1rem;
+  }
+  .question-toolbar {
+    font-size: small;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
 }
 
 /* =========================================
@@ -359,8 +491,8 @@ html, body {
 /* 3. Answered AND Flagged */
 .nav-number.answered.flagged {
   background-color: #5d8be1; /* Keep Blue BG */
-  color: #ffc107;            /* Gold Text */
-  border-color: #ffc107;     /* Gold Border */
+  color: #ffc107; /* Gold Text */
+  border-color: #ffc107; /* Gold Border */
 }
 
 /* 4. Active (Current Selection) 
@@ -376,9 +508,9 @@ html, body {
 /* 5. Active AND Flagged (The Highest Priority) 
    Must show Active Background + Flagged Border */
 .nav-number.active.flagged {
-  background-color: #202bf4;  /* Active Blue BG */
-  color: white;               /* Active White Text */
-  border-color: #ffc107;      /* Flag Gold Border */
+  background-color: #202bf4; /* Active Blue BG */
+  color: white; /* Active White Text */
+  border-color: #ffc107; /* Flag Gold Border */
   border-width: 2px;
   box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.5); /* Gold Outer Glow */
 }
@@ -392,7 +524,7 @@ html, body {
 .nav-number.correct.flagged {
   background-color: #1b4d2bd0; /* Green */
   color: #e8f5e9;
-  border-color: #ffc107;      /* Flag Gold Border */
+  border-color: #ffc107; /* Flag Gold Border */
   border-width: 2px;
 }
 
@@ -405,7 +537,7 @@ html, body {
 .nav-number.incorrect.flagged {
   background-color: #581c1c; /* Red */
   color: #ffcdcd;
-  border-color: #ffc107;      /* Flag Gold Border */
+  border-color: #ffc107; /* Flag Gold Border */
   border-width: 2px;
 }
 
@@ -416,7 +548,9 @@ html, body {
     color: #333;
     border-color: #ccc;
   }
-  .nav-number:hover { background-color: #e0e0e0; }
+  .nav-number:hover {
+    background-color: #e0e0e0;
+  }
 
   .nav-number.answered {
     background-color: #7cbcc4;
@@ -538,7 +672,8 @@ html, body {
   gap: 1rem;
 }
 
-.btn-cancel, .btn-confirm {
+.btn-cancel,
+.btn-confirm {
   padding: 0.8rem 1.5rem;
   border-radius: 4px;
   cursor: pointer;
@@ -571,9 +706,13 @@ html, body {
     background-color: #fff;
     border-color: #ccc;
   }
-  .modal-content h3 { color: #333; }
-  .modal-content p { color: #666; }
-  
+  .modal-content h3 {
+    color: #333;
+  }
+  .modal-content p {
+    color: #666;
+  }
+
   .btn-cancel {
     border-color: #ccc;
     color: #555;

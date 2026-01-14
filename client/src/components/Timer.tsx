@@ -68,11 +68,8 @@ export const Timer: React.FC<TimerProps> = ({
     <div
       className="timer-display"
       style={{
-        fontFamily: "monospace",
-        fontSize: "1.2rem",
-        fontWeight: "bold",
         // Red if under 1 minute OR negative
-        color: lowTime ? "#ff4444" : "#ffffff",
+        color: lowTime ? "#ff4444" : undefined,
       }}
     >
       TIME: {formatTime(timeLeft)}

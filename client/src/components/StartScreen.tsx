@@ -17,7 +17,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
         display: "flex",
         flexDirection: "column",
         gap: "2rem",
-        marginTop: "10vh",
+        marginTop: "auto",
       }}
     >
       {/* 1. Timing Mode Selection */}
@@ -45,7 +45,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
             Strict (Forced Move)
           </button>
         </div>
-        <p style={{ fontSize: "0.9rem", color: "#aaa", marginTop: "0.5rem" }}>
+        <p style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}>
           {timingMode === "STRICT"
             ? "When time is up, you will be forced to the next section."
             : "When time is up, you can choose to keep working (timer goes negative)."}

@@ -147,18 +147,10 @@ function App() {
         </h1>
 
         {testMode !== "MENU" && (
-          <div
-            className="header-controls"
-            style={{
-              display: "flex",
-              gap: "1rem",
-              alignItems: "center",
-              paddingRight: "1rem",
-            }}
-          >
+          <div className="header-controls">
             {!testMode.includes("REVIEW") && hideTimerButtonAvailable && (
-              <button onClick={toggleTimerHide} style={{ minWidth: "80px" }}>
-                {hideTimer ? "Unhide Timer" : "Hide Timer"}
+              <button onClick={toggleTimerHide} style={{ minWidth: "4rem" }}>
+                {hideTimer ? "UNHIDE TIMER" : "HIDE TIMER"}
               </button>
             )}
             {!testMode.includes("REVIEW") && (
@@ -171,26 +163,34 @@ function App() {
               />
             )}
             {!testMode.includes("REVIEW") && (
-              <button onClick={togglePause} style={{ minWidth: "80px" }}>
+              <button onClick={togglePause} style={{ minWidth: "4rem" }}>
                 {testMode === "PAUSED" ? "RESUME" : "PAUSE"}
               </button>
             )}
-            {!testMode.includes("REVIEW") &&
-              sectionNumber < questions.length - 1 && (
-                <button
-                  onClick={handleEndSectionRequest}
-                  style={{ minWidth: "100px" }}
-                >
-                  END SECTION
+            <div style={{ display: "flex", flex: 1, flexDirection: "column" }}>
+              {!testMode.includes("REVIEW") && (
+                <button onClick={handleStopRequest} className="btn-stop">
+                  END TEST & REVIEW
                 </button>
               )}
-            {!testMode.includes("REVIEW") && (
-              <button onClick={handleStopRequest} className="btn-stop">
-                END TEST & REVIEW
-              </button>
-            )}
+              {!testMode.includes("REVIEW") &&
+                sectionNumber < questions.length - 1 && (
+                  <button
+                    onClick={handleEndSectionRequest}
+                    style={{ minWidth: "100px" }}
+                  >
+                    END SECTION
+                  </button>
+                )}
+            </div>
             {testMode === "REVIEW" && (
-              <div style={{ color: "#4caf50", fontWeight: "bold" }}>
+              <div
+                style={{
+                  display: "flex",
+                  color: "#4caf50",
+                  fontWeight: "bold",
+                }}
+              >
                 <button
                   onClick={() => setTestMode("FULL_REVIEW")}
                   className="btn-stop"

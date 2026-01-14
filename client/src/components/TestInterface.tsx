@@ -27,6 +27,7 @@ export const TestInterface: React.FC<TestInterfaceProps> = (props) => {
   const [questionContext, setQuestionContext] = useState<string[]>([]);
   const [questionProblem, setQuestionProblem] = useState<string>("");
   const [questionAnswers, setQuestionAnswers] = useState<string[]>([]);
+  const [rightPaneHidden, setRightPaneHidden] = useState<boolean>(false);
 
   // State initialization only runs once on mount.
   // We keep this local so answers persist until App unmounts TestInterface.
@@ -201,7 +202,8 @@ export const TestInterface: React.FC<TestInterfaceProps> = (props) => {
     correctIndex: number,
     userSelectedIndex: number
   ) => {
-    const baseClass = "answer-btn";
+    const baseClass =
+      "answer-decoy-btn" + (testMode === "REVIEW" ? " disabled" : "");
 
     // REVIEW MODE LOGIC
     if (testMode === "REVIEW") {
@@ -230,10 +232,8 @@ export const TestInterface: React.FC<TestInterfaceProps> = (props) => {
     return baseClass;
   };
 
-  
-// If Full Review, show the summary dashboard
+  // If Full Review, show the summary dashboard
   if (testMode === "FULL_REVIEW") {
-    
     // Helper to calculate score for a specific section index
     const getNumberCorrect = (sIdx: number) => {
       return questions[sIdx].reduce((count, q, qIdx) => {
@@ -291,18 +291,18 @@ export const TestInterface: React.FC<TestInterfaceProps> = (props) => {
                         {isSkipped
                           ? "Skipped"
                           : String.fromCharCode(65 + userAnsIdx)}
-                        
+
                         {/* If wrong, show correct answer */}
                         {!isCorrect && !isSkipped && (
                           <span style={{ color: "#aaa", marginLeft: "8px" }}>
-                             (Correct: {String.fromCharCode(65 + correctIdx)})
+                            (Correct: {String.fromCharCode(65 + correctIdx)})
                           </span>
                         )}
                         {/* If skipped, show correct answer */}
                         {isSkipped && (
-                           <span style={{ color: "#aaa", marginLeft: "8px" }}>
-                             (Ans: {String.fromCharCode(65 + correctIdx)})
-                           </span>
+                          <span style={{ color: "#aaa", marginLeft: "8px" }}>
+                            (Ans: {String.fromCharCode(65 + correctIdx)})
+                          </span>
                         )}
                       </span>
                     </div>
@@ -312,12 +312,16 @@ export const TestInterface: React.FC<TestInterfaceProps> = (props) => {
             );
           })}
         </div>
-        
-        <button 
-          onClick={() => window.location.reload()} 
-          style={{marginTop: "2rem", padding: "1rem 2rem", fontSize: "1.2rem"}}
+
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            marginTop: "2rem",
+            padding: "1rem 2rem",
+            fontSize: "1.2rem",
+          }}
         >
-            Return to Menu
+          Return to Menu
         </button>
       </div>
     );
@@ -326,155 +330,169 @@ export const TestInterface: React.FC<TestInterfaceProps> = (props) => {
   // STANDARD TEST VIEW
   return (
     <div className="App-body">
-      <aside className="pane left">
+      <aside className={"pane left" + (rightPaneHidden ? " expanded" : "")}>
+        <button
+          className="mode-buttons"
+          onClick={() => setRightPaneHidden((prev) => !prev)}
+        >
+          {rightPaneHidden ? "UNHIDE QUESTIONS" : "HIDE QUESTIONS"}
+        </button>
         {questionContext.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
       </aside>
 
-      <main className="pane right">
-        <div className="question-toolbar">
-          <span className="question-label">
-            Section {sectionNumber + 1} • Question {questionNumber + 1}
-          </span>
-          {testMode === "REVIEW" ? (
+      {!rightPaneHidden && (
+        <main className="pane right">
+          <div className="question-toolbar">
             <span className="question-label">
-              {getNumberCorrect(sectionNumber)} / {questions[sectionNumber].length} Correct
+              Section {sectionNumber + 1} • Question {questionNumber + 1}
             </span>
-          ) : (
-            <></>
+            {testMode === "REVIEW" ? (
+              <span className="question-label">
+                {getNumberCorrect(sectionNumber)} /{" "}
+                {questions[sectionNumber].length} Correct
+              </span>
+            ) : (
+              <></>
+            )}
+
+            <button
+              className={`flag-btn ${
+                flaggedQuestions[sectionNumber][questionNumber] ? "active" : ""
+              }`}
+              onClick={toggleFlagQuestion}
+              title="Mark this question for review"
+              disabled={testMode === "REVIEW"}
+            >
+              {/* Simple SVG Flag Icon */}
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style={{ marginRight: "8px" }}
+              >
+                <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z" />
+              </svg>
+              {flaggedQuestions[sectionNumber][questionNumber]
+                ? "Flagged"
+                : "Flag for Review"}
+            </button>
+          </div>
+
+          {testMode === "REVIEW" && (
+            <div
+              className={`review-status ${isCorrect ? "correct" : "incorrect"}`}
+            >
+              {userSelectedIndex === -1
+                ? "UNANSWERED"
+                : isCorrect
+                ? "CORRECT"
+                : "INCORRECT"}
+            </div>
           )}
 
-          <button
-            className={`flag-btn ${
-              flaggedQuestions[sectionNumber][questionNumber] ? "active" : ""
-            }`}
-            onClick={toggleFlagQuestion}
-            title="Mark this question for review"
-            disabled={testMode === "REVIEW"}
-          >
-            {/* Simple SVG Flag Icon */}
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              style={{ marginRight: "8px" }}
+          <div className="question-area">
+            <p className="question-text">{questionProblem}</p>
+            <div className="answers-container">
+              {questionAnswers.map((a, i) => {
+                const isSelected =
+                  selectedAnswers[sectionNumber][questionNumber] === i;
+                const isEliminated =
+                  eliminated[sectionNumber][questionNumber][i];
+
+                return (
+                  <div className="answer-buttons" key={i}>
+                    <button
+                      className={
+                        "answer-decoy-btn eliminate" +
+                        (isEliminated ? " eliminated" : "") +
+                        (testMode === "REVIEW" || isSelected ? " disabled" : "")
+                      }
+                      onClick={() => toggleEliminated(i)}
+                      disabled={testMode === "REVIEW" || isSelected}
+                    >
+                      {isEliminated ? "Restore" : "X"}
+                    </button>
+
+                    <button
+                      className={getAnswerClassName(
+                        i,
+                        correctIndex,
+                        userSelectedIndex
+                      )}
+                      disabled={isEliminated || testMode === "REVIEW"}
+                      onClick={() => selectAnswer(i)}
+                    >
+                      <span className="answer-letter">
+                        {String.fromCharCode(65 + i)}.{" "}
+                      </span>
+                      {a}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="navigation-bar">
+            <button
+              className="nav-arrow"
+              onClick={handlePrev}
+              disabled={sectionNumber === 0 && questionNumber === 0}
             >
-              <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z" />
-            </svg>
-            {flaggedQuestions[sectionNumber][questionNumber]
-              ? "Flagged"
-              : "Flag for Review"}
-          </button>
-        </div>
+              &larr; Prev
+            </button>
 
-        {testMode === "REVIEW" && (
-          <div
-            className={`review-status ${isCorrect ? "correct" : "incorrect"}`}
-          >
-            {userSelectedIndex === -1
-              ? "UNANSWERED"
-              : isCorrect
-              ? "CORRECT"
-              : "INCORRECT"}
-          </div>
-        )}
+            <div className="question-scroller" ref={navScrollRef}>
+              {questions[sectionNumber].map((q, index) => {
+                // 1. Determine if this specific question (index) is correct
+                const userAns = selectedAnswers[sectionNumber][index];
+                const correctAns = q.label;
+                const isCorrect = userAns === correctAns;
 
-        <div className="question-area">
-          <p className="question-text">{questionProblem}</p>
-          <div className="answers-container">
-            {questionAnswers.map((a, i) => {
-              const isSelected =
-                selectedAnswers[sectionNumber][questionNumber] === i;
-              const isEliminated = eliminated[sectionNumber][questionNumber][i];
+                // 2. Build the class string
+                let navClass = "nav-number";
 
-              return (
-                <div className="answer-buttons" key={i}>
+                // Always show active state
+                if (index === questionNumber) navClass += " active";
+
+                if (testMode === "REVIEW") {
+                  // Review Mode: Green if correct, Red if wrong (or unanswered)
+                  navClass += isCorrect ? " correct" : " incorrect";
+                } else {
+                  // Normal Mode: Show if answered or flagged
+                  if (userAns !== -1) navClass += " answered";
+                }
+                if (flaggedQuestions[sectionNumber][index])
+                  navClass += " flagged";
+
+                return (
                   <button
-                    className="eliminate-btn"
-                    onClick={() => toggleEliminated(i)}
-                    disabled={testMode === "REVIEW"}
+                    key={index}
+                    className={navClass}
+                    onClick={() => setQuestionNumber(index)}
                   >
-                    {isEliminated ? "Restore" : "X"}
+                    {index + 1}
                   </button>
+                );
+              })}
+            </div>
 
-                  <button
-                    className={getAnswerClassName(
-                      i,
-                      correctIndex,
-                      userSelectedIndex
-                    )}
-                    disabled={isEliminated || testMode === "REVIEW"}
-                    onClick={() => selectAnswer(i)}
-                  >
-                    <span className="answer-letter">
-                      {String.fromCharCode(65 + i)}.{" "}
-                    </span>
-                    {a}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="navigation-bar">
-          <button
-            className="nav-arrow"
-            onClick={handlePrev}
-            disabled={sectionNumber === 0 && questionNumber === 0}
-          >
-            &larr; Prev
-          </button>
-
-          <div className="question-scroller" ref={navScrollRef}>
-            {questions[sectionNumber].map((q, index) => {
-              // 1. Determine if this specific question (index) is correct
-              const userAns = selectedAnswers[sectionNumber][index];
-              const correctAns = q.label;
-              const isCorrect = userAns === correctAns;
-
-              // 2. Build the class string
-              let navClass = "nav-number";
-
-              // Always show active state
-              if (index === questionNumber) navClass += " active";
-
-              if (testMode === "REVIEW") {
-                // Review Mode: Green if correct, Red if wrong (or unanswered)
-                navClass += isCorrect ? " correct" : " incorrect";
-              } else {
-                // Normal Mode: Show if answered or flagged
-                if (userAns !== -1) navClass += " answered";
+            <button
+              className="nav-arrow"
+              onClick={handleNext}
+              disabled={
+                sectionNumber === questions.length - 1 &&
+                questionNumber === questions[sectionNumber].length - 1
               }
-              if (flaggedQuestions[sectionNumber][index])
-                navClass += " flagged";
-
-              return (
-                <button
-                  key={index}
-                  className={navClass}
-                  onClick={() => setQuestionNumber(index)}
-                >
-                  {index + 1}
-                </button>
-              );
-            })}
+            >
+              Next &rarr;
+            </button>
           </div>
-
-          <button
-            className="nav-arrow"
-            onClick={handleNext}
-            disabled={
-              sectionNumber === questions.length - 1 &&
-              questionNumber === questions[sectionNumber].length - 1
-            }
-          >
-            Next &rarr;
-          </button>
-        </div>
-      </main>
+        </main>
+      )}
     </div>
   );
 };

@@ -10,6 +10,8 @@ The simulator supports both light and dark mode based on your device settings.
 
 The simulator also scales based on your zoom level and screen size. I recommend zooming out to see all answer choices.
 
+The simulator will also work on mobile devices (via the hosted link), though the user experience is not particularly well-developed at the moment. Your mileage may vary.
+
 ## Important Note on RC
 For readability in RC, the readings have been split into paragraphs using https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2 to determine sentence similarity, and an arbitrary decision to split readings into 3-6 paragraphs. Some of these paragraph splits are odd, but hopefully preferable to a wall of text. Code for my splitting can be found here: https://colab.research.google.com/drive/1aVpm_OioFG7VPMmch3p4G25p0fJqGtE7?usp=sharing 
 
@@ -46,7 +48,7 @@ If you want to be able to run the game offline, please follow the instructions b
 6. Run the application
     * Copy `lsat-simulator` into your terminal and press enter
 7. Open the application on your web browser
-    * In a web browser, go to http://localhost:8000/
+    * In a web browser, go to http://localhost:8000/LSAT-Simulator
         * You've navigated to the game now!
 
 To start the game from now on, just copy `lsat-simulator` into your terminal and press enter.
@@ -73,7 +75,7 @@ I believe powershell will be better to use than command line because of the forw
 6. Start the application:
     * run `npm start`
 7. Open the application on your web browser
-    * navigate to http://localhost:8000/ in a web browser
+    * navigate to http://localhost:8000/LSAT-Simulator in a web browser
 
 To run the game from now on, repeat steps 4, 6, and 7.
 
