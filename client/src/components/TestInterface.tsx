@@ -115,7 +115,11 @@ export const TestInterface: React.FC<TestInterfaceProps> = (props) => {
       newSelectedAnswers[sectionNumber] = [
         ...newSelectedAnswers[sectionNumber],
       ];
-      newSelectedAnswers[sectionNumber][questionNumber] = answerIndex;
+      if (newSelectedAnswers[sectionNumber][questionNumber] == answerIndex) {
+        newSelectedAnswers[sectionNumber][questionNumber] = -1; // null out if click twice
+      } else {
+        newSelectedAnswers[sectionNumber][questionNumber] = answerIndex;
+      }
       return newSelectedAnswers;
     });
   };
