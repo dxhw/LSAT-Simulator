@@ -3,7 +3,7 @@
    ========================================= */
 html,
 body {
-  height: 100%;
+  height: 100dvh;
   margin: 0;
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
@@ -34,6 +34,7 @@ body {
   box-sizing: border-box;
   background-color: #272731;
   border-bottom: 1px solid #333;
+  padding-top: max(1rem, env(safe-area-inset-top)); /* Use the larger of the two */
 }
 
 .header {
@@ -416,7 +417,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 1rem;
   background-color: #1a1a1a;
   border-top: 1px solid #444;
   height: 60px;
@@ -451,6 +452,12 @@ body {
   .nav-arrow {
     border-color: #bbb;
     color: #555;
+  }
+}
+
+@media (max-width: 768px) {
+  .navigation-bar {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 }
 
