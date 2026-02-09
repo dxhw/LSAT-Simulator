@@ -40,8 +40,8 @@ function App() {
   };
 
   // --- HANDLER: Start Test ---
-  const handleStartTest = (type: TestType, mode: TimingMode) => {
-    const loadedData = loadQuestions(type);
+  const handleStartTest = (type: TestType, mode: TimingMode, seed: string) => {
+    const loadedData = loadQuestions(type, seed);
     setQuestions(loadedData);
     setTimingMode(mode); // Save the mode
     setSectionNumber(0);
@@ -54,7 +54,7 @@ function App() {
     if (timingMode === "STRICT") {
       setConfirmationTitle("Time is Up!");
       setConfirmationMessage(
-        "Strict Mode: You must move to the next section now."
+        "Strict Mode: You must move to the next section now.",
       );
 
       // Both Confirm (OK) and Cancel (attempt to close) force the move
@@ -67,7 +67,7 @@ function App() {
     else {
       setConfirmationTitle("Time is Up!");
       setConfirmationMessage(
-        "35 Minutes have passed. Confirm to move on or Cancel to keep working (overtime)"
+        "35 Minutes have passed. Confirm to move on or Cancel to keep working (overtime)",
       );
 
       // Confirm: Move On
@@ -92,7 +92,7 @@ function App() {
   const handleEndSectionRequest = () => {
     setConfirmationTitle("End Section Early?");
     setConfirmationMessage(
-      "Are you sure you want to finish this section? You will not be able to return to it."
+      "Are you sure you want to finish this section? You will not be able to return to it.",
     );
 
     setConfirmAction(() => () => moveToNextSection());
@@ -103,7 +103,7 @@ function App() {
   const handleStopRequest = () => {
     setConfirmationTitle("Finish Test?");
     setConfirmationMessage(
-      "Are you sure you want to stop the timer and review your answers?"
+      "Are you sure you want to stop the timer and review your answers?",
     );
     setConfirmAction(() => () => {
       setSectionNumber(0);
@@ -122,7 +122,7 @@ function App() {
     if (testMode !== "MENU") {
       setConfirmationTitle("Quit Test?");
       setConfirmationMessage(
-        "Are you sure you want to quit? Your progress will be lost."
+        "Are you sure you want to quit? Your progress will be lost.",
       );
       setConfirmAction(() => () => {
         setTestMode("MENU");

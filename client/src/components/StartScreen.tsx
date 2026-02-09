@@ -4,11 +4,12 @@ import { TestType } from "./data/QuestionLoadUtil";
 export type TimingMode = "STRICT" | "FLEXIBLE";
 
 interface StartScreenProps {
-  onStart: (type: TestType, mode: TimingMode) => void;
+  onStart: (type: TestType, mode: TimingMode, seed: string) => void;
 }
 
 export const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
   const [timingMode, setTimingMode] = useState<TimingMode>("FLEXIBLE");
+  const [testSeed, setTestSeed] = useState<string>("");
 
   return (
     <div
@@ -54,9 +55,11 @@ export const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
 
       <hr style={{ width: "50%", borderColor: "#444" }} />
 
-      {/* 2. Test Type Selection */}
+      {/* 2. Add test seed */}
       <div className="mode-buttons">
-        <h3>2. Start Practice Test</h3>
+        <h3>
+          2. Add A Test Seed (Optional — For Taking The Same Test As Others)
+        </h3>
         <div
           style={{
             display: "flex",
@@ -65,16 +68,40 @@ export const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
             flexWrap: "wrap",
           }}
         >
-          <button onClick={() => onStart("FULL", timingMode)}>Full Test<br/>
-          (4 Sections — Mix of LR + RC)</button>
-          <button onClick={() => onStart("LR", timingMode)}>
+          <input
+            type="text"
+            placeholder="Enter a test seed (e.g. 'my-test-123')"
+            value={testSeed}
+            onChange={(e) => setTestSeed(e.target.value)}
+            style={{ padding: "0.5rem", width: "300px" }}
+          />
+        </div>
+      </div>
+
+      {/* 3. Test Type Selection */}
+      <div className="mode-buttons">
+        <h3>3. Start Practice Test</h3>
+        <div
+          style={{
+            display: "flex",
+            gap: "1rem",
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <button onClick={() => onStart("FULL", timingMode, testSeed)}>
+            Full Test
+            <br />
+            (4 Sections — Mix of LR + RC)
+          </button>
+          <button onClick={() => onStart("LR", timingMode, testSeed)}>
             Logical Reasoning
           </button>
-          <button onClick={() => onStart("RC", timingMode)}>
+          <button onClick={() => onStart("RC", timingMode, testSeed)}>
             Reading Comprehension
           </button>
-          <button onClick={() => onStart("AR", timingMode)}>
-            (FOR FUN ONLY) <br/>
+          <button onClick={() => onStart("AR", timingMode, testSeed)}>
+            (FOR FUN ONLY) <br />
             Analytical Reasoning
           </button>
         </div>
