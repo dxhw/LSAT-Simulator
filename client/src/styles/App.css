@@ -740,14 +740,14 @@ body {
 /* --- REVIEW MODE STYLES --- */
 
 /* The user selected this WRONG answer */
-.answer-btn.incorrect {
+.answer-decoy-btn.incorrect {
   background-color: #581c1c; /* Dark Red background */
   border-color: #ff5252;
   color: #ffcdcd;
 }
 
 /* This is the CORRECT answer (whether selected or not) */
-.answer-btn.correct {
+.answer-decoy-btn.correct {
   background-color: #1b4d2bd0; /* Dark Green background */
   border-color: #69f0ae;
   color: #e8f5e9;
