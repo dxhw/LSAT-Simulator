@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { localHostActive, getLocalValue } from "../util";
 
 interface TimerProps {
   sectionNumber: number;
@@ -16,7 +17,7 @@ export const Timer: React.FC<TimerProps> = ({
   limitedTimeRemaining,
 }) => {
   const SECTION_TIME = 35 * 60;
-  const [timeLeft, setTimeLeft] = useState(SECTION_TIME);
+  const [timeLeft, setTimeLeft] = useState<number>(() => getLocalValue("lsat_timeLeft", SECTION_TIME));
 
   // Ref to track if we have already triggered the "Time Up" callback for this section
   // This prevents the modal from popping up repeatedly every second after 0.
@@ -24,9 +25,19 @@ export const Timer: React.FC<TimerProps> = ({
 
   // Reset when section changes
   useEffect(() => {
+    if (localHostActive() && sectionNumber == getLocalValue("lsat_sectionNumber", null)) {
+      // the section hasn't actually changed, we just refreshed
+      return;
+    }
     setTimeLeft(SECTION_TIME);
     hasTriggeredRef.current = false;
   }, [sectionNumber]);
+
+  useEffect(() => {
+    if (!localHostActive()) return;
+
+    localStorage.setItem("lsat_timeLeft", JSON.stringify(timeLeft));
+  }, [timeLeft]);
 
   useEffect(() => {
     if (isPaused) return;

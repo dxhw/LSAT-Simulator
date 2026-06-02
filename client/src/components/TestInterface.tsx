@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { AppQuestion } from "./data/QuestionLoadUtil";
 import { TestMode } from "./App"; // Import the type
+import { localHostActive, getLocalValue } from "../util"
 
 interface TestInterfaceProps {
   questions: AppQuestion[][];
@@ -22,7 +23,7 @@ export const TestInterface: React.FC<TestInterfaceProps> = (props) => {
   const { questions, sectionNumber, setSectionNumber, testMode } = props;
 
   // --- LOCAL STATE ---
-  const [questionNumber, setQuestionNumber] = useState<number>(0);
+  const [questionNumber, setQuestionNumber] = useState<number>(() => getLocalValue("lsat_questionNumber", 0));
 
   const [questionContext, setQuestionContext] = useState<string[]>([]);
   const [questionProblem, setQuestionProblem] = useState<string>("");
@@ -37,8 +38,8 @@ export const TestInterface: React.FC<TestInterfaceProps> = (props) => {
     )
   );
   const [selectedAnswers, setSelectedAnswers] = useState<number[][]>(
-    () => questions.map((section) => Array<number>(section.length).fill(-1)) // Fill -1 for no answer
-  );
+    () => getLocalValue("lsat_selectedAnswers", questions.map((section) => Array<number>(section.length).fill(-1))) // Fill -1 for no answer
+  )
   const [flaggedQuestions, setFlaggedQuestions] = useState<boolean[][]>(() =>
     questions.map((section) => Array<boolean>(section.length).fill(false))
   );
@@ -81,16 +82,34 @@ export const TestInterface: React.FC<TestInterfaceProps> = (props) => {
 
   // Reset question number when section changes (e.g. forced by Timer in App)
   useEffect(() => {
+    if (localHostActive() && sectionNumber == getLocalValue("lsat_sectionNumber", null)) {
+        // the section hasn't actually changed, we just refreshed
+        return;
+    }
+
     if (testMode !== "REVIEW") {
+      
       setQuestionNumber(0);
     }
   }, [sectionNumber]);
 
   useEffect(() => {
+    if (localHostActive() && testMode == getLocalValue("lsat_testMode", null)) {
+        // the test mode hasn't actually changed, we just refreshed
+        return;
+    }
     if (testMode === "REVIEW") {
       setQuestionNumber(0);
     }
   }, [testMode]);
+
+  // --- Persist to localStorage on Change ---
+  useEffect(() => {
+    if (!localHostActive()) return;
+
+    localStorage.setItem("lsat_selectedAnswers", JSON.stringify(selectedAnswers));
+    localStorage.setItem("lsat_questionNumber", JSON.stringify(questionNumber))
+  }, [selectedAnswers, questionNumber]);
 
   // --- HANDLERS ---
 
@@ -142,23 +161,28 @@ export const TestInterface: React.FC<TestInterfaceProps> = (props) => {
     if (questionNumber < currentSectionLength - 1) {
       setQuestionNumber((n) => n + 1);
     } else if (sectionNumber < questions.length - 1) {
-      // Logic for moving to next section
-      const confirmNextAction = () => {
-        props.setShowConfirm(false);
-        setSectionNumber((s) => s + 1); // Uses Prop
+      if (testMode === "REVIEW") {
+        setSectionNumber((s) => s + 1);
         setQuestionNumber(0);
-      };
-      const cancelNextAction = () => {
-        props.setShowConfirm(false);
-      };
+      } else {
+        // Logic for moving to next section
+        const confirmNextAction = () => {
+          props.setShowConfirm(false);
+          setSectionNumber((s) => s + 1); // Uses Prop
+          setQuestionNumber(0);
+        };
+        const cancelNextAction = () => {
+          props.setShowConfirm(false);
+        };
 
-      props.setConfirmAction(() => confirmNextAction);
-      props.setCancelAction(() => cancelNextAction);
-      props.setConfirmationTitle("Move On To Next Section?");
-      props.setConfirmationMessage(
-        "Once you move on to the next section you will not be able to return and the timer will reset!"
-      );
-      props.setShowConfirm(true);
+        props.setConfirmAction(() => confirmNextAction);
+        props.setCancelAction(() => cancelNextAction);
+        props.setConfirmationTitle("Move On To Next Section?");
+        props.setConfirmationMessage(
+          "Once you move on to the next section you will not be able to return and the timer will reset!"
+        );
+        props.setShowConfirm(true);
+      }
     }
   };
 

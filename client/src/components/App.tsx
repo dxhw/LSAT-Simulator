@@ -1,23 +1,26 @@
 import "../styles/App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { loadQuestions, AppQuestion, TestType } from "./data/QuestionLoadUtil";
 import { StartScreen, TimingMode } from "./StartScreen";
 import { TestInterface } from "./TestInterface";
 import { ConfirmationModal } from "./ConfirmationModal";
 import { Timer } from "./Timer";
+import { localHostActive, getLocalValue } from "../util"
 
 export type TestMode = "MENU" | "RUNNING" | "PAUSED" | "REVIEW" | "FULL_REVIEW";
 
 function App() {
-  const [testMode, setTestMode] = useState<TestMode>("MENU");
-  const [questions, setQuestions] = useState<AppQuestion[][]>([]);
-  const [sectionNumber, setSectionNumber] = useState<number>(0);
+  const isLocalhost = localHostActive()
 
-  // NEW: Store the selected timing mode
-  const [timingMode, setTimingMode] = useState<TimingMode>("STRICT");
-  const [hideTimer, setHideTimer] = useState<boolean>(false);
-  const [hideTimerButtonAvailable, setHideTimerButtonAvailable] =
-    useState<boolean>(true);
+// Initialize states from localStorage if available on localhost
+  const [testMode, setTestMode] = useState<TestMode>(() => getLocalValue("lsat_testMode", "MENU"));
+  const [questions, setQuestions] = useState<AppQuestion[][]>(() => getLocalValue("lsat_questions", []));
+  const [sectionNumber, setSectionNumber] = useState<number>(() => getLocalValue("lsat_sectionNumber", 0));
+  const [timingMode, setTimingMode] = useState<TimingMode>(() => getLocalValue("lsat_timingMode", "STRICT"));
+  const [hideTimer, setHideTimer] = useState<boolean>(() => getLocalValue("lsat_hideTimer", false));
+  const [hideTimerButtonAvailable, setHideTimerButtonAvailable] = useState<boolean>(() => 
+    getLocalValue("lsat_hideTimerButtonAvailable", true)
+  );
 
   // Modal State
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
@@ -25,6 +28,18 @@ function App() {
   const [confirmationMessage, setConfirmationMessage] = useState<string>("");
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
   const [cancelAction, setCancelAction] = useState<() => void>(() => {});
+
+  // --- EFFECT: Persist to localStorage on Change ---
+  useEffect(() => {
+    if (!isLocalhost) return;
+
+    localStorage.setItem("lsat_testMode", JSON.stringify(testMode));
+    localStorage.setItem("lsat_questions", JSON.stringify(questions));
+    localStorage.setItem("lsat_sectionNumber", JSON.stringify(sectionNumber));
+    localStorage.setItem("lsat_timingMode", JSON.stringify(timingMode));
+    localStorage.setItem("lsat_hideTimer", JSON.stringify(hideTimer));
+    localStorage.setItem("lsat_hideTimerButtonAvailable", JSON.stringify(hideTimerButtonAvailable));
+  }, [testMode, questions, sectionNumber, timingMode, hideTimer, hideTimerButtonAvailable]);
 
   // --- HELPER: Move to Next Section ---
   const moveToNextSection = () => {
@@ -129,6 +144,10 @@ function App() {
         setQuestions([]);
         setSectionNumber(0);
         setShowConfirm(false);
+        // Clear local storage explicitly on user reset
+        if (isLocalhost) {
+          localStorage.clear(); 
+        }
       });
       setCancelAction(() => () => setShowConfirm(false));
       setShowConfirm(true);
